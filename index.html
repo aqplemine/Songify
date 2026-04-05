@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Songify</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header>
+        <h1>Songify</h1>
+        <p>Create a Spotify-powered recommendation playlist in minutes.</p>
+      </header>
+
+      <section class="card auth-card">
+        <h2>1) Connect Spotify</h2>
+        <p class="muted">
+          Sign in to Spotify and authorize playlist access. Songify uses the OAuth
+          PKCE flow (no client secret in the browser).
+        </p>
+        <button id="loginBtn" class="primary">Connect with Spotify</button>
+        <div id="authStatus" class="status">Not connected.</div>
+      </section>
+
+      <section class="card">
+        <h2>2) Pick up to 5 seed songs</h2>
+        <div class="search-row">
+          <input id="trackSearchInput" type="text" placeholder="Search tracks (e.g., Blinding Lights)" />
+          <button id="searchBtn">Search</button>
+        </div>
+        <ul id="searchResults" class="list"></ul>
+        <h3>Seeds</h3>
+        <ul id="seedList" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <h2>3) Generate recommendations</h2>
+        <button id="recommendBtn" class="primary">Get Recommendations</button>
+        <ul id="recommendations" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <h2>4) Create playlist in your Spotify account</h2>
+        <div class="search-row">
+          <input id="playlistNameInput" type="text" value="My Songify Mix" />
+          <button id="createPlaylistBtn" class="primary">Create Playlist from Checked Songs</button>
+        </div>
+        <p class="muted">
+          Tip: uncheck any recommendation you do not want before creating your playlist.
+        </p>
+        <div id="playlistStatus" class="status"></div>
+      </section>
+    </main>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
