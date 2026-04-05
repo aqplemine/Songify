@@ -1,4 +1,4 @@
-const CLIENT_ID = 'REPLACE_WITH_YOUR_SPOTIFY_CLIENT_ID';
+const CLIENT_ID = '90367941689c4d7dae7df7bf641bc83e';
 const REDIRECT_URI = window.location.origin + window.location.pathname;
 const SCOPES = ['playlist-modify-private', 'playlist-modify-public'];
 
