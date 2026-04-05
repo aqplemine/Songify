@@ -3,6 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Songify | Spotify Playlist Builder</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <aside class="menu card">
+        <h1>Songify</h1>
+        <p class="muted">Build recommendation playlists from one polished page.</p>
+
+        <nav class="nav-list" aria-label="Songify menu">
+          <button class="nav-btn active" data-target="setup">Setup + Connect</button>
+          <button class="nav-btn" data-target="search">Search & Seed Songs</button>
+          <button class="nav-btn" data-target="recommend">Recommendations</button>
+          <button class="nav-btn" data-target="create">Create Playlist</button>
+        </nav>
+
+        <button id="loginBtn" class="primary block">Connect / Reconnect Spotify</button>
+        <div id="authStatus" class="status">Not connected.</div>
+      </aside>
+
+      <section class="content">
+        <article id="setup" class="card panel">
+          <h2>Setup (production domain friendly)</h2>
+          <p class="muted">
+            Paste Spotify Client ID (safe in frontend). Do not expose your client secret in this site.
+          </p>
+          <label for="clientIdInput">Spotify Client ID</label>
+          <div class="search-row">
+            <input id="clientIdInput" type="text" placeholder="Paste your Spotify Client ID" />
+            <button id="saveClientBtn">Save</button>
+          </div>
+          <p class="muted">
+            Add this exact Redirect URI in Spotify Dashboard:
+            <code id="redirectUriText"></code>
+          </p>
+        </article>
+
+        <article id="search" class="card panel">
+          <h2>Search & choose up to 5 seed songs</h2>
+          <div class="search-row">
+            <input id="trackSearchInput" type="text" placeholder="Search tracks (e.g., Blinding Lights)" />
+            <button id="searchBtn">Search</button>
+          </div>
+          <ul id="searchResults" class="list"></ul>
+          <h3>Seed songs</h3>
+          <ul id="seedList" class="list"></ul>
+        </article>
+
+        <article id="recommend" class="card panel">
+          <h2>Generate recommendations</h2>
+          <button id="recommendBtn" class="primary">Get Recommendations</button>
+          <ul id="recommendations" class="list"></ul>
+        </article>
+
+        <article id="create" class="card panel">
+          <h2>Create playlist</h2>
+          <div class="search-row">
+            <input id="playlistNameInput" type="text" value="My Songify Mix" />
+            <button id="createPlaylistBtn" class="primary">Create Playlist from Checked Songs</button>
+          </div>
+          <div id="playlistStatus" class="status"></div>
+        </article>
     <title>Songify</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
