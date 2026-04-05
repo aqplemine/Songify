@@ -4,9 +4,6 @@ const SCOPES = ['playlist-modify-private', 'playlist-modify-public'];
 
 const loginBtn = document.getElementById('loginBtn');
 const authStatus = document.getElementById('authStatus');
-const clientIdInput = document.getElementById('clientIdInput');
-const saveClientBtn = document.getElementById('saveClientBtn');
-const redirectUriText = document.getElementById('redirectUriText');
 const trackSearchInput = document.getElementById('trackSearchInput');
 const searchBtn = document.getElementById('searchBtn');
 const searchResults = document.getElementById('searchResults');
@@ -16,12 +13,6 @@ const recommendations = document.getElementById('recommendations');
 const createPlaylistBtn = document.getElementById('createPlaylistBtn');
 const playlistNameInput = document.getElementById('playlistNameInput');
 const playlistStatus = document.getElementById('playlistStatus');
-const navButtons = [...document.querySelectorAll('.nav-btn')];
-
-let clientId = localStorage.getItem('spotify_client_id') || '';
-let accessToken = null;
-let currentUser = null;
-let seedTracks = [];
 
 let accessToken = null;
 let currentUser = null;
@@ -31,20 +22,6 @@ let recommendedTracks = [];
 const setStatus = (node, message, isError = false) => {
   node.textContent = message;
   node.classList.toggle('error', isError);
-};
-
-const updateActionState = () => {
-  const enabled = Boolean(accessToken);
-  searchBtn.disabled = !enabled;
-  recommendBtn.disabled = !enabled;
-  createPlaylistBtn.disabled = !enabled;
-  trackSearchInput.disabled = !enabled;
-};
-
-const ensureAuthenticated = () => {
-  if (accessToken) return true;
-  setStatus(authStatus, 'Please connect Spotify first.', true);
-  return false;
 };
 
 const generateRandomString = (length) => {
@@ -67,24 +44,6 @@ const toBase64Url = (bytes) =>
     .replace(/\//g, '_')
     .replace(/=+$/, '');
 
-const getClientId = () => clientId.trim();
-
-const saveClientId = () => {
-  const incoming = clientIdInput.value.trim();
-  if (!incoming) {
-    setStatus(authStatus, 'Please paste your Spotify Client ID.', true);
-    return;
-  }
-
-  clientId = incoming;
-  localStorage.setItem('spotify_client_id', clientId);
-  setStatus(authStatus, 'Client ID saved. Next: Connect Spotify.');
-};
-
-const startSpotifyLogin = async () => {
-  const cid = getClientId();
-  if (!cid) {
-    setStatus(authStatus, 'Save your Spotify Client ID first.', true);
 const startSpotifyLogin = async () => {
   if (CLIENT_ID === 'REPLACE_WITH_YOUR_SPOTIFY_CLIENT_ID') {
     setStatus(authStatus, 'Set CLIENT_ID in app.js first.', true);
@@ -97,7 +56,6 @@ const startSpotifyLogin = async () => {
 
   const params = new URLSearchParams({
     response_type: 'code',
-    client_id: cid,
     client_id: CLIENT_ID,
     scope: SCOPES.join(' '),
     code_challenge_method: 'S256',
@@ -109,14 +67,6 @@ const startSpotifyLogin = async () => {
 };
 
 const exchangeCodeForToken = async (code) => {
-  const cid = getClientId();
-  if (!cid) throw new Error('No Spotify Client ID saved.');
-
-  const verifier = localStorage.getItem('spotify_pkce_verifier');
-  if (!verifier) throw new Error('Missing PKCE verifier. Click connect again.');
-
-  const body = new URLSearchParams({
-    client_id: cid,
   const verifier = localStorage.getItem('spotify_pkce_verifier');
   if (!verifier) throw new Error('Missing PKCE verifier in localStorage.');
 
@@ -139,12 +89,6 @@ const exchangeCodeForToken = async (code) => {
 
   accessToken = data.access_token;
   sessionStorage.setItem('spotify_access_token', accessToken);
-  updateActionState();
-};
-
-const spotifyFetch = async (url, options = {}) => {
-  if (!accessToken) throw new Error('No token provided. Connect Spotify first.');
-
 };
 
 const spotifyFetch = async (url, options = {}) => {
@@ -157,13 +101,6 @@ const spotifyFetch = async (url, options = {}) => {
       ...(options.headers || {}),
     },
   });
-
-  if (res.status === 401) {
-    accessToken = null;
-    sessionStorage.removeItem('spotify_access_token');
-    updateActionState();
-    throw new Error('Spotify token expired or missing. Click Connect/Reconnect Spotify.');
-  }
 
   if (!res.ok) {
     const msg = await res.text();
@@ -226,8 +163,6 @@ const renderSeeds = () => {
 };
 
 const searchTracks = async () => {
-  if (!ensureAuthenticated()) return;
-
   const q = trackSearchInput.value.trim();
   if (!q) return;
 
@@ -238,7 +173,6 @@ const searchTracks = async () => {
     );
     renderTrackList(searchResults, data.tracks.items, 'Add seed', (track) => {
       if (seedTracks.length >= 5) {
-        setStatus(playlistStatus, 'Spotify recommendations support up to 5 seed songs.', true);
         setStatus(playlistStatus, 'Spotify recommendations supports up to 5 seeds.', true);
         return;
       }
@@ -252,9 +186,6 @@ const searchTracks = async () => {
 };
 
 const getRecommendations = async () => {
-  if (!ensureAuthenticated()) return;
-  if (!seedTracks.length) {
-    setStatus(playlistStatus, 'Add at least 1 seed song first.', true);
   if (!seedTracks.length) {
     setStatus(playlistStatus, 'Add at least 1 seed track first.', true);
     return;
@@ -266,8 +197,6 @@ const getRecommendations = async () => {
       seed_tracks: seedTracks.map((t) => t.id).join(','),
     });
     const data = await spotifyFetch(`https://api.spotify.com/v1/recommendations?${params}`);
-    renderTrackList(recommendations, data.tracks, '', () => {}, true);
-    setStatus(playlistStatus, `Loaded ${data.tracks.length} recommendations.`);
     recommendedTracks = data.tracks;
     renderTrackList(recommendations, recommendedTracks, '', () => {}, true);
     setStatus(playlistStatus, `Loaded ${recommendedTracks.length} recommendations.`);
@@ -277,7 +206,6 @@ const getRecommendations = async () => {
 };
 
 const createPlaylist = async () => {
-  if (!ensureAuthenticated()) return;
   if (!currentUser) {
     setStatus(playlistStatus, 'Connect Spotify first.', true);
     return;
@@ -306,7 +234,6 @@ const createPlaylist = async () => {
       body: JSON.stringify({ uris }),
     });
 
-    setStatus(playlistStatus, `Done! Playlist created: ${created.name}.`);
     setStatus(
       playlistStatus,
       `Done! Playlist created: ${created.name}. Open Spotify to view it.`
@@ -314,19 +241,6 @@ const createPlaylist = async () => {
   } catch (err) {
     setStatus(playlistStatus, err.message, true);
   }
-};
-
-const setupNav = () => {
-  navButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const section = document.getElementById(btn.dataset.target);
-      if (!section) return;
-
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      navButtons.forEach((node) => node.classList.remove('active'));
-      btn.classList.add('active');
-    });
-  });
 };
 
 const completeOAuthIfNeeded = async () => {
@@ -349,7 +263,6 @@ const completeOAuthIfNeeded = async () => {
     }
   } else {
     accessToken = sessionStorage.getItem('spotify_access_token');
-    updateActionState();
   }
 
   if (accessToken) {
@@ -357,15 +270,6 @@ const completeOAuthIfNeeded = async () => {
   }
 };
 
-const bootstrap = () => {
-  clientIdInput.value = clientId;
-  redirectUriText.textContent = REDIRECT_URI;
-  updateActionState();
-  setupNav();
-};
-
-loginBtn.addEventListener('click', startSpotifyLogin);
-saveClientBtn.addEventListener('click', saveClientId);
 loginBtn.addEventListener('click', startSpotifyLogin);
 searchBtn.addEventListener('click', searchTracks);
 recommendBtn.addEventListener('click', getRecommendations);
@@ -377,5 +281,4 @@ trackSearchInput.addEventListener('keydown', (e) => {
   }
 });
 
-bootstrap();
 completeOAuthIfNeeded().catch((err) => setStatus(authStatus, err.message, true));
