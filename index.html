@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Songify | AI-ish Spotify Playlist Builder</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero card">
+        <p class="badge">Spotify Playlist App</p>
+        <h1>Songify</h1>
+        <p class="hero-copy">
+          A polished landing page + in-browser Spotify integration. Users can authorize,
+          search songs, get recommendations, and instantly create playlists.
+        </p>
+        <div class="hero-actions">
+          <button id="loginBtn" class="primary">Add Songify to Spotify</button>
+          <a class="ghost" href="#setup">Setup</a>
+        </div>
+        <div id="authStatus" class="status">Not connected.</div>
+      </section>
+
+      <section id="setup" class="card">
+        <h2>App Setup (for your production domain)</h2>
+        <p class="muted">
+          Enter your Spotify <strong>Client ID</strong> (safe for frontend). Do not expose your
+          client secret in this website.
+        </p>
+        <label for="clientIdInput">Spotify Client ID</label>
+        <div class="search-row">
+          <input id="clientIdInput" type="text" placeholder="Paste your Spotify Client ID" />
+          <button id="saveClientBtn">Save</button>
+        </div>
+        <p class="muted">
+          Register this exact Redirect URI in Spotify Dashboard:
+          <code id="redirectUriText"></code>
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>Pick up to 5 seed songs</h2>
+        <div class="search-row">
+          <input id="trackSearchInput" type="text" placeholder="Search tracks (e.g., Blinding Lights)" />
+          <button id="searchBtn">Search</button>
+        </div>
+        <ul id="searchResults" class="list"></ul>
+        <h3>Seeds</h3>
+        <ul id="seedList" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Generate recommendations</h2>
+        <button id="recommendBtn" class="primary">Get Recommendations</button>
+        <ul id="recommendations" class="list"></ul>
+      </section>
+
+      <section class="card">
+        <h2>Create playlist in Spotify</h2>
+        <div class="search-row">
+          <input id="playlistNameInput" type="text" value="My Songify Mix" />
+          <button id="createPlaylistBtn" class="primary">Create Playlist from Checked Songs</button>
+        </div>
+        <div id="playlistStatus" class="status"></div>
+      </section>
+    </main>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
